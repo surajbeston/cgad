@@ -15,9 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from api.views import phoneAssembler, laptopAssembler
+from api.views import phoneAssembler, laptopAssembler, phone_search, initiateSession, available_checker, negater, search_suggestion
+from api.views import whoosh_indexer
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("assemble/", laptopAssembler)
+    path("assemble/", laptopAssembler),
+    path("available/", available_checker),
+    path("negater/", negater),
+    path("index/", whoosh_indexer),
+    path("search_suggest", search_suggestion),
+    path("find", phone_search),
+    path("", initiateSession)
 ]

@@ -5,7 +5,7 @@
         <h1 class = "heading  head-right">Compare </h1>
       </b-col>
       <b-col cols="2" id = "img-head">
-        <b-img class = "head-img" center src="~assets/ReLogo2.svg" alt="Left image"></b-img>
+        <b-img class = "head-img" center src="~assets/logo.svg" alt="Left image"></b-img>
       </b-col>
       <b-col cols = "5">
         <h1 class = "heading  head-left">Gadjets</h1>
@@ -50,16 +50,18 @@
 
   .head-right{
     text-align: right;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
     padding-right: 2%;
+    background-image: linear-gradient(to right, #a3acdb , #5c6bc0);
   }
 
   .head-left{
     text-align: left;
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
+    border-top-left-radius: 50px;
+    border-bottom-left-radius: 50px;
     padding-left: 2%;
+    background-image: linear-gradient(to left, #a3acdb , #5c6bc0);
   }
 
 
@@ -160,8 +162,6 @@
         .line{
             font-size: 1.2em;
         }
-
-
   }
 
           @media only screen and (max-width: 450px) {
@@ -170,16 +170,19 @@
         }
 
         .head-img{
-            height: 55px;
+            height: 50px;
         }
         .line{
             font-size: 1.15em;
         }
-
-
-
-
   }
+
+
+            @media only screen and (max-width: 400px) {
+            .head-img{
+            height: 43px;
+        }
+            }
 
 
             @media only screen and (max-width: 350px) {

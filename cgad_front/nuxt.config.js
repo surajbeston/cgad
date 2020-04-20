@@ -20,7 +20,8 @@ export default {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       { href: 'https://fonts.googleapis.com/css?family=Baloo+Thambi+2|Sen&display=swap', rel: 'stylesheet'},
       { href: 'https://fonts.googleapis.com/css?family=Roboto+Slab&display=swap', rel: 'stylesheet'},
-      { href: 'https://fonts.googleapis.com/css?family=Teko&display=swap', rel: 'stylesheet'}
+      { href: 'https://fonts.googleapis.com/css?family=Teko&display=swap', rel: 'stylesheet'},
+      { href: 'https://fonts.googleapis.com/css?family=Dosis|Fredoka+One&display=swap', rel: 'stylesheet'}
     ]
   },
   /*
@@ -36,6 +37,7 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
+    '~/plugins/bus'
   ],
   /*
   ** Nuxt.js dev-modules
@@ -48,6 +50,7 @@ export default {
   modules: [
     // Doc: https://bootstrap-vue.js.org
     'bootstrap-vue/nuxt',
+    '@nuxtjs/axios',
   ],
   /*
   ** Build configuration
@@ -58,5 +61,6 @@ export default {
     */
     extend (config, ctx) {
     }
-  }
+  },
+
 }

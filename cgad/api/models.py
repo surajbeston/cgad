@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import JSONField
 class OriginalSmartphone(models.Model):
     data = JSONField()
     append_datetime = models.DateTimeField(auto_now = True)
-
+    available = models.BooleanField(default=False)
     def __str__(self):
         return self.data["DeviceName"]
 
@@ -15,6 +15,8 @@ class ScrapedSmartphone(models.Model):
     site = models.CharField(max_length = 200)
     data = JSONField()
     append_datetime = models.DateTimeField(auto_now = True)
+    available = models.BooleanField(default=False)
+    belongs_to = models.ForeignKey(OriginalSmartphone, on_delete= models.CASCADE, blank = True, null = True)
     class Meta:
         app_label = "api"
 
@@ -42,4 +44,14 @@ class ScrapedLaptop(models.Model):
 
     def __str__(self):
         return self.data["name"] + "  -  " + self.site
+
+class AccessLog(models.Model):
+    sessionId = models.CharField(max_length = 50)
+    client_ip = models.CharField(max_length = 40)
+    user_agent = models.CharField(max_length = 400)
+    datetime = models.DateTimeField(auto_now= True)
+    
+class RequestLog(models.Model):
+    session = models.ForeignKey(AccessLog, on_delete = models.CASCADE) 
+    datetime = models.DateTimeField(auto_now=True)  
 

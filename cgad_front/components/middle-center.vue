@@ -1,30 +1,31 @@
 <template>
     <div id = "main-box" @click="adjustSize" >
+
         <div id = "search-box">
-          <div id = "search-icon-box"> <img id = "search-icon" src = "~assets/Search.svg" /> </div><div id = "input-box-wrap" ><input id = "input-box" type = "text" @click = "deVaulter" /></div>
+          <div id = "search-icon-box"> <img id = "search-icon" src = "~assets/Search.svg" /> </div><div id = "input-box-wrap" ><input id = "input-box" type = "text" @click = "deVaulter" v-model = "search_text" @blur="removeSuggestions" onclick="this.select()" autocomplete="off"/></div>
           
         </div>
         <div style="text-align: center;">
             <div id = "search-suggestion-box">
-                <ul v-for="phone in phones" :key= "phone.name" class = "search-suggestion" @click="requester(phone)">
-                    {{phone.name}}
+                <ul v-for="phone in phones" :key= "phone.name" class = "search-suggestion" @click="phoneRequester(phone)">
+                    {{phone}}
                 </ul>
             </div>
         </div>
 
         <div class = "product-detail-box">
-            <h2 id = "phone-name">Apple Iphone 11</h2>
-            <div style= "">
+            <h2 id = "phone-name">{{phone_name}}</h2>
+            <div style= "" >
                 <div  class = "product-image-box">
-                        <img src = "https://images-na.ssl-images-amazon.com/images/I/51V8ObWrpKL._AC_SX569_.jpg" class = "product-image" /> 
+                        <img :src = "phone_image" class = "product-image" /> 
                 </div>
 
                 <div class = "specs-box">
                     <b-list-group>
-                        <b-list-group-item><img src = "~assets/camera.svg" class = "feature-icon" /><span class = "specs">10MP</span></b-list-group-item>
-                        <b-list-group-item><img src = "~assets/ram.svg" class = "feature-icon" /><span class ="specs">10GB</span></b-list-group-item>
-                        <b-list-group-item><img src = "~assets/battery.svg" class = "feature-icon" /><span class = "specs">400MaH</span></b-list-group-item>
-                        <b-list-group-item><img src = "~assets/Processor.svg" class = "feature-icon" /><span class = "specs">ARM Cortex 400</span></b-list-group-item>
+                        <b-list-group-item><img src = "~assets/camera.svg" class = "feature-icon" /><div class = "specs">{{camera}}</div></b-list-group-item>
+                        <b-list-group-item><img src = "~assets/ram.svg" class = "feature-icon" /><div class ="specs">{{specs.ram}}</div></b-list-group-item>
+                        <b-list-group-item><img src = "~assets/battery.svg" class = "feature-icon" /><div class = "specs">{{specs.battery}}</div></b-list-group-item>
+                        <b-list-group-item><img src = "~assets/Processor.svg" class = "feature-icon" /><div class = "specs">{{specs.processor}}</div></b-list-group-item>
                     </b-list-group>
                 </div>   
             </div>
@@ -32,26 +33,26 @@
 
 
         <div id = "search-result-box">
-            <div  v-for ="product in products" :key = "product" class="search-result">
-                <div class = "product-details">
-                    <div class = "price">Rs. {{product.price}}</div>
-                    <div class = "platform">{{product.platform}}</div>
-                </div>
+            <div  v-for ="product in products" :key = "product" class="search-result" >
+                <div @click="phoneRedirect(product.url)">
+                    <div class = "product-details" >
+                        <div class = "name">{{product.name}} </div>
+                        <div class = "price">Rs. {{product.price}}</div>
+                        <div class = "platform">{{product.vendor}}</div>
+                    </div>
+        
 
-                <div class = "suggested-or-not">
-                    <b>SUGGESTED</b>
-                </div>    
-
-                <div class = "platform-banner">
-                    <img src ="https://laz-img-cdn.alicdn.com/images/ims-web/TB1eIwbmljTBKNjSZFuXXb0HFXa.png" class = "banner-img">
-                </div>        
+                    <div class = "platform-banner">
+                        <img :src = "product.brandLogoUrl" class = "banner-img">
+                    </div> 
+                </div>           
             </div>    
         </div> 
 
 
-        <h2 class = "small-line" id ="small-line">//////////////////////////////////////////////////////////////////////////////////////</h2>
-
-        <b-row>
+        <h2 class = "small-line" id ="small-line">/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////</h2>
+    <div id = "phone-suggestion-wrap">
+        <b-row >
             <b-col class = "phone-suggestion-box">
                 <div class = "suggestion-image-box">
                     <img src = "https://images-na.ssl-images-amazon.com/images/I/51V8ObWrpKL._AC_SX569_.jpg" class = "suggestion-image">
@@ -94,69 +95,85 @@
                 </div>
             </b-col>
         </b-row>
-
+    </div>
 
     </div>        
 </template>
 
 <script>
-import { Search } from 'bootstrap-vue'
 export default {
-    components: {
-        Search
-    },
     data: function (){
       return {
         phones: [
           ],
-          phonesVault: [
-            {name: "Apple Iphone 6"},
-            {name: "Apple Iphone 7"},
-            {name: "Apple Iphone 8"},
-            {name: "Apple Iphone 9"},
-            {name: "Apple Iphone X"},
-            {name: "Apple Iphone 11"}
-          ],
+          phonesVault: [],
           products: [
-              {price: "1,23,423", platform: "daraz.com"},
-              {price: "34,58,745", platform: "okdam.com"}
-          ]
+              {price: "1,23,423", platform: "daraz.com", name: "Apple Iphone 64 GB 128 GB Exclusive"},
+              {price: "34,58,745", platform: "okdam.com", name: "Apple Iphone 64 GB 128 GB Exclusive"}
+          ],
+          sessionId: {},
+          search_text: "jkehfd",
+          just_searched: false,
+          phone_name: "Apple Iphone 11",
+          slug: "",
+          hasSessionId: false,
+          phone_image: "https://images-na.ssl-images-amazon.com/images/I/51V8ObWrpKL._AC_SX569_.jpg",
+          camera: "",
+          specs: {"camera": "10 MP", "ram": "12 GB", "battery": "1200 MAh", "processor": "ARM Cortex 420"}
         }
     },
 
     methods: {
-        search: function(){
-
-
-        },
         deVaulter: function(){
-            document.getElementById("search-suggestion-box").style.display = "inline-block";
-            this.phones = this.phonesVault;
+            this.phones = this.phonesVault
+            let all_names = document.getElementsByClassName("search-suggestion")
+            if (all_names.length > 1 && !this.just_searched){
+                document.getElementById("search-suggestion-box").style.display = "inline-block"
+            }
+            else{
+                this.reVaulter()
+            }
+            this.just_searched = false
             console.log("De Vaulted!")
         },
         reVaulter: function(){
             document.getElementById("search-suggestion-box").style.display = "none";
         },
-        requester: function(e){
+        phoneRequester: function(phone){
             console.log("Reached here");
-            document.getElementById("input-box").value = e.name;
-            this.reVaulter();
+            this.just_searched = true
+            this.search_text = phone
+            this.reVaulter()
+            let slug = phone.replace(" ", "-")
+            console.log(slug)
+            this.$router.push(slug)            
         },
+        removeSuggestions: function(){
+            setTimeout(this.reVaulter, 200)
+        },
+
         adjustSize: function(){
             let height = document.getElementById("search-result-box").offsetHeight
             let height1 = document.getElementById("search-suggestion-box").offsetHeight
             let height2 = document.getElementById("search-box").offsetHeight
-            let height3 = document.getElementById("small-line").offsetHeight
 
-
-            document.getElementById("main-box").style.height = height + height1 + height2 + height3 + 2000 +"px"
 
             document.getElementById("small-line").style.marginTop = height + height1 + height2 + "px"
+
+            let height3 = document.getElementById("small-line").offsetHeight
+            let height4= document.getElementById("phone-suggestion-wrap").offsetHeight
+
+            console.log(height4)
+
+            document.getElementById("main-box").style.height = height + height1 + height2 + height3 + height4 *2   +"px"
+
+            
+            console.log("size adjusted")
+            this.reVaulter()
         },
 
         adjustSpecs: function(){
             let listObjs = document.getElementsByClassName("specs")
-            console.log(listObjs)
             let maxLength = 0
 
             let textArr = []
@@ -185,19 +202,114 @@ export default {
             for (let index in listObjs){
                 if (index <= 3){
                 listObjs[index].innerHTML = newtextArr[index]
-
                 }
             }
+        },
+        async getSessionId() {
+        let data = await this.$axios.$get('http://localhost:8000')
+        this.sessionId = data["sessionId"]
+        this.hasSessionId = true
+        },
+        async getSearchSuggestions(word){
+            let that = this
+            let data = await this.$axios.post('http://localhost:8000/search_suggest', {
+                    sessionId: this.sessionId,
+                    keyword: word
+                })
+                .then(function (response) {
+                    that.phonesVault = response["data"]
+                    that.deVaulter()
+                    console.log(response["data"])
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
 
-
+        async getPhone(phone){
+            let that = this
+            console.log(this.sessionId)
+            console.log(phone)
+            console.log(phone)
+            let data = await this.$axios.post('http://localhost:8000/find', {
+                sessionId: this.sessionId,
+                phone_name: phone
+            })
+            .then(function (response){
+                console.log(response["data"])
+                if (response["data"][1] != null){
+                    console.log(response["data"][1])
+                    that.products = response["data"][1]
+                    that.phone_image = "http://localhost:8001/phone_images/" + response["data"][0]["image"]
+                    that.phone_name = phone
+                    that.search_text = phone
+                    that.updateSpecs(response["data"][2])
+                    that.$nextTick(() => {
+                        that.adjustSize()
+                     })
+                }
+            })
+           .catch(function (error) {
+               console.log("error section")
+                console.log(error);
+            });
+        },
+        doNothing: function(){
+            console.log(this.hasSessionId)
+            this.fetchData()
+        },
+        fetchData: function(){
+            if (this.hasSessionId){
+                let slug = this.$route.params.phone_name
+                this.getPhone(slug.replace("-", " "))
+            }
+            else{
+                setTimeout(this.doNothing, 100)
+            }
+        },
+        phoneRedirect: function(url){
+            window.open(url, '_blank');
+        },
+        updateSpecs: function(specs){
+            let listObjs = document.getElementsByClassName("specs")
+            listObjs[0].innerHTML = specs["camera"]
+            listObjs[1].innerHTML = specs["ram"]
+            listObjs[2].innerHTML = specs["battery"]
+            listObjs[3].innerHTML = specs["processor"]
+        }
+    },
+    watch: {
+        search_text: function (val){
+            console.log(this.just_searched)
+            console.log(val.length)
+            this.phonesVault = []
+            if (val.length > 1 && !this.just_searched){
+                console.log("sending request")
+                this.getSearchSuggestions(val)
+            }
         }
     },
 
     mounted() {
         this.adjustSize()
-        this.adjustSpecs()
+        window.addEventListener("resize", this.adjustSize)
+        this.slug = this.$route.params.phone_name
+       if (this.slug != ""){     
+           console.log(this.sessionId)
+           console.log(this.slug.replace("-", " "))      
+        this.getPhone(this.slug.replace("-", " "))
+        }
 
-    }
+        
+    },
+    created(){
+       this.getSessionId()
+       this.fetchData()
+
+    },
+    destroyed() {
+        window.removeEventListener("resize", this.adjustSize);
+    },
 }
 </script>
 
@@ -268,7 +380,9 @@ export default {
 
 .feature-icon{
     height: 30px;
-    margin-right: 10%;
+    margin-left: 10%;
+    left: 0;
+    position: absolute;
 }
 
 #search-result-box{ 
@@ -306,20 +420,30 @@ export default {
 }
 
 .platform-banner{
-    float: right;
+    right: 5%;
+    position: absolute;
     margin-top: 5%;
-    margin-right: 10%;
 }
 
 .banner-img{
     width: 150px;
     height: 50px;
+    margin-top: 10%;
 }
 
 .price{
     font-size: 150%;
-    margin-top: 25%;
+    margin-top: 3%;
     font-weight: 500;
+    color: #0b1969;
+}
+
+.name{
+    font-size: 150%;
+    margin-top: 0;
+    margin-left: -5%;
+    font-weight: 400;
+    color: #5c6bc0;
 }
 
 .platform{
@@ -364,7 +488,8 @@ export default {
 .suggestion-image{
     height: inherit;
     display: inline-block;
-    margin: 5%;
+    margin-top: 5%;
+    margin-bottom: 5%;
 
 }
 
@@ -425,11 +550,17 @@ export default {
 
 .specs-box{
     margin: 5% 20% 3% 25%;
+    text-align: left;
+
 }
 
 .specs{
-    color: 0b1969;
+    color: #0b1969;
     font-weight: bold;
+    margin-left: 20%;
+    line-height: 2em;
+    display: inline-block;
+
 }
 
 #phone-name{
@@ -501,9 +632,13 @@ export default {
     height: 40px;
     }
 
+    .name{
+        font-size: 130%;
+    }
+
     .price{
         font-size: 130%;
-        margin-top: 20%;
+        margin-top: 5%;
     }
 
     .platform{
@@ -534,6 +669,7 @@ export default {
 
     #search-suggestion-box{
         width: 400px;
+        margin-left: 6%;
     }    
 
        #search-result-box{ 
@@ -545,17 +681,22 @@ export default {
 
     .search-result{
         width: 400px;
-        height: 100px;
+        height: 110px;
     }
 
     .banner-img{
     width: 100px;
     height: 30px;
+    margin-top: 15%;
+    }
+
+    .name{
+        font-size: 120%;
     }
 
     .price{
         font-size: 120%;
-        margin-top: 20%;
+        margin-top: 0;
     }
 
     .platform{
@@ -579,6 +720,10 @@ export default {
     .name-suggestion{
         font-size: 110%;
     }
+
+    .specs{
+        font-size: 0.9em;
+    }
     
 
 
@@ -601,12 +746,12 @@ export default {
     }  
 
     #search-result-box{ 
-        margin-left: -135px;
+        margin-left: -200px;
     
     }
 
     .search-result{
-        width: 300px;
+        width: 400px;
         height: 80px;
     }
 
@@ -615,9 +760,13 @@ export default {
     height: 23px;
     }
 
+    .name{
+        font-size: 100%;
+    }
+
     .price{
         font-size: 100%;
-        margin-top: 20%;
+        margin-top: 5%;
     }
 
     .platform{
@@ -641,7 +790,7 @@ export default {
 
 
     .specs-box{
-    margin: 5% 30% 3% 34%;
+    margin: 5% 15% 3% 14%;
 }
 
 
@@ -659,6 +808,8 @@ export default {
         font-size: 90%;
     }
 
+
+    
 
 
 }
@@ -682,15 +833,14 @@ export default {
 
 .specs-box{
  font-size:90%;   
-margin: 5% 15% 3% 15%;
+margin: 5% 10% 3% 9%;
 }
 
 
 .phone-suggestion-box{
     border: 1px solid #aaaa;
-    margin: 10%;
     border-radius: 5px;
-    margin: 2.5% 15% 2.5% 15%;
+    margin: 2.5% 20% 2.5% 20%;
     }
 
 .suggestion-image-box {
@@ -709,6 +859,8 @@ margin: 5% 15% 3% 15%;
 
     .search-result{
         width: 400px;
+        height: 90px; 
+
         margin-top: 10%;
     }
 
@@ -729,20 +881,63 @@ margin: 5% 15% 3% 15%;
 
 #phone-name{
     font-size: 1.3em;
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: 20%;
+    margin-right: 20%;
 }
 
 .suggested-or-not{
     display: none;
 } 
 
+    #search-suggestion-box{
+
+        margin-left: 7%;
+    }
+    .search-suggestion{
+        text-align: left;
+    }
 
 
 }
 
+@media only screen and (max-width: 450px) {
 
 
+    #search-result-box{ 
+
+        margin-left: -175px;
+    }
+    .search-result{
+        height: 90px;
+    }
+
+    .specs-box{
+        margin-left: 5%;
+        margin-right: 5%;
+        font-size: 0.8em;
+    }
+
+
+    .phone-suggestion-box{
+
+        margin-left: 15%;
+        margin-right: 15%;
+    }
+
+
+    #search-suggestion-box{
+
+        margin-left: 10%;
+    }
+
+    .search-suggestion{
+        text-align: left;
+    }
+
+
+
+
+}
 
 
 
@@ -763,23 +958,29 @@ margin: 5% 15% 3% 15%;
 
 
     #search-result-box{ 
-    margin-left: -110px;
+    margin-left: -130px;
     
     }
 
     .search-result{
-        width: 250px;
-        height: 70px;
+        width: 300px;
+        height: 90px;
     }
 
     .banner-img{
     width: 60px;
     height: 18px;
+    margin-top: 20px;
+    margin-right: 10px;
+    }
+
+    .name{
+        font-size: 90%;
     }
 
     .price{
         font-size: 90%;
-        margin-top: 20%;
+        margin-top: 0;
     }
 
     .platform{
@@ -795,6 +996,25 @@ margin: 5% 15% 3% 15%;
     .small-line{
             font-size: 1.15em;
         }
+
+        .specs-box{
+    margin: 5% 10% 3% 9%;
+}    
+
+    .specs-box{
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .phone-suggestion-box{
+
+        margin-left: 10%;
+        margin-right: 10%;
+    }
+
+
+
+
 }
 
 
